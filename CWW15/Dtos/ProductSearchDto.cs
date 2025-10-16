@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CWW15.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,5 +17,7 @@ namespace CWW15.Dtos
         public string? Color { get; set; }
         public string? Brand { get; set; }
         public int? MinStock { get; set; }
+        public SortByOptionEnum? SortBy { get; set; }
+        public SortDirectionOptionEnum? SortDirection { get; set; }
     }
 }

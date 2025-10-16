@@ -3,6 +3,7 @@
 using CWW15.DataAccess;
 using CWW15.Dtos; 
 using CWW15.Entities;
+using CWW15.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace CWW15.Repositories
@@ -20,7 +21,7 @@ namespace CWW15.Repositories
         {
             var query = _context.Products.Include(p => p.Category).AsQueryable();
 
-            
+
             if (!string.IsNullOrWhiteSpace(searchDto.Name))
             {
                 query = query.Where(p => p.Name.Contains(searchDto.Name));
@@ -60,7 +61,43 @@ namespace CWW15.Repositories
             {
                 query = query.Where(p => p.Stock >= searchDto.MinStock.Value);
             }
+            if (searchDto.SortBy.HasValue)
+            {
 
+                if (searchDto.SortDirection == SortDirectionOptionEnum.Descending)
+                {
+                    switch (searchDto.SortBy)
+                    {
+                        case SortByOptionEnum.Name:
+                            query = query.OrderByDescending(p => p.Name);
+                            break;
+                        case SortByOptionEnum.Price:
+                            query = query.OrderByDescending(p => p.Price);
+                            break;
+                        case SortByOptionEnum.Stock:
+                            query = query.OrderByDescending(p => p.Stock);
+                            break;
+                    }
+                }
+
+                else
+                {
+                    switch (searchDto.SortBy)
+                    {
+                        case SortByOptionEnum.Name:
+                            query = query.OrderBy(p => p.Name);
+                            break;
+                        case SortByOptionEnum.Price:
+                            query = query.OrderBy(p => p.Price);
+                            break;
+                        case SortByOptionEnum.Stock:
+                            query = query.OrderBy(p => p.Stock);
+                            break;
+                    }
+                }
+
+                
+            }
             return query.ToList();
         }
     }
