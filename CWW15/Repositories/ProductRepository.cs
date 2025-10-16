@@ -98,6 +98,13 @@ namespace CWW15.Repositories
 
                 
             }
+            if (searchDto.PageNumber.HasValue && searchDto.PageSize.HasValue)
+            {
+              
+                query = query.Skip((searchDto.PageNumber.Value - 1) * searchDto.PageSize.Value)
+                           
+                             .Take(searchDto.PageSize.Value);
+            }
             return query.ToList();
         }
     }

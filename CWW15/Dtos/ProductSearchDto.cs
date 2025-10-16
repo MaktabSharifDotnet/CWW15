@@ -19,5 +19,7 @@ namespace CWW15.Dtos
         public int? MinStock { get; set; }
         public SortByOptionEnum? SortBy { get; set; }
         public SortDirectionOptionEnum? SortDirection { get; set; }
+        public int? PageNumber { get; set; }
+        public int? PageSize { get; set; }
     }
 }
