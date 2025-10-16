@@ -1,4 +1,5 @@
-﻿using CWW15.Dtos;
+﻿
+using CWW15.Dtos;
 using CWW15.Entities;
 using CWW15.Repositories;
 
@@ -13,19 +14,11 @@ namespace CWW15.Services
             _productRepository = productRepository;
         }
 
+      
         public List<Product> SearchProducts(ProductSearchDto searchDto)
         {
-          
-            var products = _productRepository.SearchProducts(
-                searchDto.Name,
-                searchDto.MinPrice,
-                searchDto.MaxPrice,
-                searchDto.CategoryId,
-                searchDto.CategoryName,
-                searchDto.Color,
-                searchDto.Brand,
-                searchDto.MinStock);
-
+            
+            var products = _productRepository.SearchProducts(searchDto);
             return products;
         }
     }

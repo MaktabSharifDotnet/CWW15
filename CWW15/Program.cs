@@ -1,51 +1,41 @@
 ﻿
+
 using CWW15.DataAccess;
+using CWW15.Dtos; 
 using CWW15.Repositories;
 using CWW15.Services;
-
 
 var dbContext = new AppDbContext();
 var productRepository = new ProductRepository(dbContext);
 var productService = new ProductService(productRepository);
 
-
 Console.WriteLine("--- Product Search ---");
 
+var searchDto = new ProductSearchDto();
+
 Console.Write("Enter Product Name (or leave empty): ");
-string? name = Console.ReadLine();
+searchDto.Name = Console.ReadLine();
 
 Console.Write("Enter Max Price (or leave empty): ");
-
-decimal? maxPrice = null;
 var maxPriceInput = Console.ReadLine();
 if (!string.IsNullOrWhiteSpace(maxPriceInput))
 {
-    
     if (decimal.TryParse(maxPriceInput, out decimal price))
     {
-        maxPrice = price;
+        searchDto.MaxPrice = price;
     }
 }
 
 Console.WriteLine("\nSearching for products...");
 
-var results = productService.SearchProducts(
-    name,
-    minPrice: null, 
-    maxPrice: maxPrice,
-    categoryId: null,
-    categoryName: null,
-    color: null,
-    brand: null,
-    minStock: null
-);
+
+var results = productService.SearchProducts(searchDto);
 
 Console.WriteLine("\n--- Search Results ---");
- if (results.Any()) 
+if (results.Any())
 {
     foreach (var product in results)
     {
-        
         Console.WriteLine(product);
     }
 }

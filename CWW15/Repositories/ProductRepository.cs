@@ -1,5 +1,7 @@
-﻿using CWW15.DataAccess;
-using CWW15.Dtos;
+﻿
+
+using CWW15.DataAccess;
+using CWW15.Dtos; 
 using CWW15.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,51 +15,50 @@ namespace CWW15.Repositories
             _context = context;
         }
 
-        public List<Product> SearchProducts(ProductSearchDto productSearchDto)
-            
+
+        public List<Product> SearchProducts(ProductSearchDto searchDto)
         {
             var query = _context.Products.Include(p => p.Category).AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(productSearchDto.Name))
+            
+            if (!string.IsNullOrWhiteSpace(searchDto.Name))
             {
-                query = query.Where(p => p.Name.Contains(productSearchDto.Name));
+                query = query.Where(p => p.Name.Contains(searchDto.Name));
             }
 
-            if (productSearchDto.MinPrice.HasValue)
+            if (searchDto.MinPrice.HasValue)
             {
-                query = query.Where(p => p.Price >= productSearchDto.MinPrice.Value);
+                query = query.Where(p => p.Price >= searchDto.MinPrice.Value);
             }
 
-            if (productSearchDto.MaxPrice.HasValue)
+            if (searchDto.MaxPrice.HasValue)
             {
-                query = query.Where(p => p.Price <= productSearchDto.MaxPrice.Value);
+                query = query.Where(p => p.Price <= searchDto.MaxPrice.Value);
             }
 
-            if (productSearchDto.CategoryId.HasValue)
+            if (searchDto.CategoryId.HasValue)
             {
-                query = query.Where(p => p.CategoryId == productSearchDto.CategoryId.Value);
+                query = query.Where(p => p.CategoryId == searchDto.CategoryId.Value);
             }
 
-           
-            if (!string.IsNullOrWhiteSpace(productSearchDto.CategoryName))
+            if (!string.IsNullOrWhiteSpace(searchDto.CategoryName))
             {
-                
-                query = query.Where(p => p.Category.Name.Contains(productSearchDto.CategoryName));
+                query = query.Where(p => p.Category.Name.Contains(searchDto.CategoryName));
             }
 
-            if (!string.IsNullOrWhiteSpace(productSearchDto.Color))
+            if (!string.IsNullOrWhiteSpace(searchDto.Color))
             {
-                query = query.Where(p => p.Color == productSearchDto.Color);
+                query = query.Where(p => p.Color == searchDto.Color);
             }
 
-            if (!string.IsNullOrWhiteSpace(productSearchDto.Brand))
+            if (!string.IsNullOrWhiteSpace(searchDto.Brand))
             {
-                query = query.Where(p => p.Brand == productSearchDto.Brand);
+                query = query.Where(p => p.Brand == searchDto.Brand);
             }
 
-            if (productSearchDto.MinStock.HasValue)
+            if (searchDto.MinStock.HasValue)
             {
-                query = query.Where(p => p.Stock >= productSearchDto.MinStock.Value);
+                query = query.Where(p => p.Stock >= searchDto.MinStock.Value);
             }
 
             return query.ToList();
