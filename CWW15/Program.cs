@@ -18,7 +18,6 @@ while (true)
 
     var searchDto = new ProductSearchDto();
 
-    
     Console.Write("\nEnter Product Name (or leave empty): ");
     var nameInput = Console.ReadLine();
     if (nameInput?.ToLower() == "exit") break;
@@ -67,7 +66,14 @@ while (true)
                 if (!string.IsNullOrWhiteSpace(sortDirectionInput))
                 {
                     int sortDirectionChoice = int.Parse(sortDirectionInput);
-                    searchDto.SortDirection = sortDirectionChoice == 2 ? SortDirectionOptionEnum.Descending : SortDirectionOptionEnum.Ascending;
+                    if (sortDirectionChoice == 2)
+                    {
+                        searchDto.SortDirection = SortDirectionOptionEnum.Descending;
+                    }
+                    else
+                    {
+                        searchDto.SortDirection = SortDirectionOptionEnum.Ascending;
+                    }
                 }
             }
         }
