@@ -4,7 +4,6 @@ using CWW15.Enums;
 using CWW15.Repositories;
 using CWW15.Services;
 
-
 var dbContext = new AppDbContext();
 var productRepository = new ProductRepository(dbContext);
 var productService = new ProductService(productRepository);
@@ -13,17 +12,29 @@ while (true)
 {
     Console.Clear();
     Console.WriteLine("--- Product Search Engine ---");
+    Console.WriteLine("You can leave any filter empty to ignore it.");
     Console.WriteLine("Type 'exit' at any time to quit the program.");
 
     var searchDto = new ProductSearchDto();
 
-   
-    Console.Write("\nEnter Product Name (or leave empty): ");
+
+    Console.WriteLine("\n--- Search Filters ---");
+
+    Console.Write("Enter Product Name: ");
     var nameInput = Console.ReadLine();
     if (nameInput?.ToLower() == "exit") break;
     searchDto.Name = nameInput;
 
-    Console.Write("Enter Max Price (or leave empty): ");
+    Console.Write("Enter Min Price: ");
+    var minPriceInput = Console.ReadLine();
+    if (minPriceInput?.ToLower() == "exit") break;
+    if (!string.IsNullOrWhiteSpace(minPriceInput))
+    {
+        try { searchDto.MinPrice = decimal.Parse(minPriceInput); }
+        catch (FormatException) { Console.WriteLine("Invalid format for price. Filter ignored."); }
+    }
+
+    Console.Write("Enter Max Price: ");
     var maxPriceInput = Console.ReadLine();
     if (maxPriceInput?.ToLower() == "exit") break;
     if (!string.IsNullOrWhiteSpace(maxPriceInput))
@@ -32,11 +43,36 @@ while (true)
         catch (FormatException) { Console.WriteLine("Invalid format for price. Filter ignored."); }
     }
 
- 
+    Console.Write("Enter Category Name: ");
+    var categoryNameInput = Console.ReadLine();
+    if (categoryNameInput?.ToLower() == "exit") break;
+    searchDto.CategoryName = categoryNameInput;
+
+    Console.Write("Enter Color: ");
+    var colorInput = Console.ReadLine();
+    if (colorInput?.ToLower() == "exit") break;
+    searchDto.Color = colorInput;
+
+    Console.Write("Enter Brand: ");
+    var brandInput = Console.ReadLine();
+    if (brandInput?.ToLower() == "exit") break;
+    searchDto.Brand = brandInput;
+
+    Console.Write("Enter Minimum Stock: ");
+    var minStockInput = Console.ReadLine();
+    if (minStockInput?.ToLower() == "exit") break;
+    if (!string.IsNullOrWhiteSpace(minStockInput))
+    {
+        try { searchDto.MinStock = int.Parse(minStockInput); }
+        catch (FormatException) { Console.WriteLine("Invalid format for stock. Filter ignored."); }
+    }
+
+
+  
     Console.WriteLine("\n--- Sort Options ---");
     while (true)
     {
-        Console.WriteLine("Add a sort criterion? (y/n)");
+        Console.Write("Add a sort criterion? (y/n): ");
         var addSort = Console.ReadLine();
         if (addSort?.ToLower() != "y")
         {
@@ -81,6 +117,7 @@ while (true)
     }
 
 
+    
     Console.WriteLine("\n--- Pagination Options ---");
     Console.Write("Enter Page Size (e.g., 5, or leave empty for all): ");
     var pageSizeInput = Console.ReadLine();
@@ -92,7 +129,7 @@ while (true)
             searchDto.PageSize = int.Parse(pageSizeInput);
             searchDto.PageNumber = 1;
 
-            Console.Write($"Enter Page Number (default is 1): ");
+            Console.Write("Enter Page Number (default is 1): ");
             var pageNumberInput = Console.ReadLine();
             if (pageNumberInput?.ToLower() == "exit") break;
             if (!string.IsNullOrWhiteSpace(pageNumberInput))
@@ -108,6 +145,7 @@ while (true)
         }
     }
 
+  
     Console.WriteLine("\nSearching for products...");
     var results = productService.SearchProducts(searchDto);
 
