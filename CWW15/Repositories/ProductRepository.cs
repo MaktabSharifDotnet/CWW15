@@ -1,7 +1,7 @@
 ﻿
 
 using CWW15.DataAccess;
-using CWW15.Dtos; 
+using CWW15.Dtos;
 using CWW15.Entities;
 using CWW15.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -17,56 +17,52 @@ namespace CWW15.Repositories
         }
 
 
-        public List<Product> SearchProducts(ProductSearchDto searchDto)
+        public List<Product> SearchProducts(ProductSearchDto productSearchDto)
         {
+
             var query = _context.Products.Include(p => p.Category).AsQueryable();
-
-
-            if (!string.IsNullOrWhiteSpace(searchDto.Name))
+            if (!string.IsNullOrWhiteSpace(productSearchDto.Name))
             {
-                query = query.Where(p => p.Name.Contains(searchDto.Name));
+                query = query.Where(p => p.Name.Contains(productSearchDto.Name));
             }
 
-            if (searchDto.MinPrice.HasValue)
+            if (productSearchDto.MinPrice.HasValue)
             {
-                query = query.Where(p => p.Price >= searchDto.MinPrice.Value);
+                query = query.Where(p => p.Price >= productSearchDto.MinPrice.Value);
             }
 
-            if (searchDto.MaxPrice.HasValue)
+            if (productSearchDto.MaxPrice.HasValue)
             {
-                query = query.Where(p => p.Price <= searchDto.MaxPrice.Value);
+                query = query.Where(p => p.Price <= productSearchDto.MaxPrice.Value);
+            }
+            if (productSearchDto.CategoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == productSearchDto.CategoryId.Value);
+            }
+            if (!string.IsNullOrWhiteSpace(productSearchDto.CategoryName))
+            {
+                query = query.Where(p => p.Category.Name.Contains(productSearchDto.CategoryName));
+            }
+            if (!string.IsNullOrWhiteSpace(productSearchDto.Color))
+            {
+                query = query.Where(p => p.Color == productSearchDto.Color);
+            }
+            if (!string.IsNullOrWhiteSpace(productSearchDto.Brand))
+            {
+                query = query.Where(p => p.Brand == productSearchDto.Brand);
+
             }
 
-            if (searchDto.CategoryId.HasValue)
+            if (productSearchDto.MinStock.HasValue)
             {
-                query = query.Where(p => p.CategoryId == searchDto.CategoryId.Value);
+                query = query.Where(p => p.Stock >= productSearchDto.MinStock.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(searchDto.CategoryName))
+            if (productSearchDto.SortBy.HasValue)
             {
-                query = query.Where(p => p.Category.Name.Contains(searchDto.CategoryName));
-            }
-
-            if (!string.IsNullOrWhiteSpace(searchDto.Color))
-            {
-                query = query.Where(p => p.Color == searchDto.Color);
-            }
-
-            if (!string.IsNullOrWhiteSpace(searchDto.Brand))
-            {
-                query = query.Where(p => p.Brand == searchDto.Brand);
-            }
-
-            if (searchDto.MinStock.HasValue)
-            {
-                query = query.Where(p => p.Stock >= searchDto.MinStock.Value);
-            }
-            if (searchDto.SortBy.HasValue)
-            {
-
-                if (searchDto.SortDirection == SortDirectionOptionEnum.Descending)
+                if (productSearchDto.SortDirection == SortDirectionOptionEnum.Descending)
                 {
-                    switch (searchDto.SortBy)
+                    switch (productSearchDto.SortBy)
                     {
                         case SortByOptionEnum.Name:
                             query = query.OrderByDescending(p => p.Name);
@@ -79,13 +75,14 @@ namespace CWW15.Repositories
                             break;
                     }
                 }
-
                 else
                 {
-                    switch (searchDto.SortBy)
+                    switch (productSearchDto.SortBy)
                     {
                         case SortByOptionEnum.Name:
+
                             query = query.OrderBy(p => p.Name);
+
                             break;
                         case SortByOptionEnum.Price:
                             query = query.OrderBy(p => p.Price);
@@ -94,16 +91,16 @@ namespace CWW15.Repositories
                             query = query.OrderBy(p => p.Stock);
                             break;
                     }
-                }
 
-                
+                }
             }
-            if (searchDto.PageNumber.HasValue && searchDto.PageSize.HasValue)
+
+            if (productSearchDto.PageNumber.HasValue && productSearchDto.PageSize.HasValue)
             {
-              
-                query = query.Skip((searchDto.PageNumber.Value - 1) * searchDto.PageSize.Value)
-                           
-                             .Take(searchDto.PageSize.Value);
+
+                query = query.Skip((productSearchDto.PageNumber.Value - 1) * productSearchDto.PageSize.Value)
+
+                             .Take(productSearchDto.PageSize.Value);
             }
             return query.ToList();
         }
