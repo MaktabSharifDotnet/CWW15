@@ -16,7 +16,6 @@ namespace CWW15.Repositories
             _context = context;
         }
 
-
         public List<Product> SearchProducts(ProductSearchDto searchDto)
         {
             var query = _context.Products.Include(p => p.Category).AsQueryable();
@@ -26,7 +25,6 @@ namespace CWW15.Repositories
             {
                 query = query.Where(p => p.Name.Contains(searchDto.Name));
             }
-
             if (searchDto.MinPrice.HasValue)
             {
                 query = query.Where(p => p.Price >= searchDto.MinPrice.Value);
@@ -61,42 +59,88 @@ namespace CWW15.Repositories
             {
                 query = query.Where(p => p.Stock >= searchDto.MinStock.Value);
             }
-            if (searchDto.SortBy.HasValue)
-            {
 
-                if (searchDto.SortDirection == SortDirectionOptionEnum.Descending)
+            if (searchDto.SortCriteria.Any())
+            {
+                
+                var firstCriterion = searchDto.SortCriteria.First();
+                IOrderedQueryable<Product> orderedQuery;
+
+                if (firstCriterion.SortDirection == SortDirectionOptionEnum.Descending)
                 {
-                    switch (searchDto.SortBy)
+                    
+                    switch (firstCriterion.SortBy)
                     {
                         case SortByOptionEnum.Name:
-                            query = query.OrderByDescending(p => p.Name);
+                            orderedQuery = query.OrderByDescending(p => p.Name);
                             break;
                         case SortByOptionEnum.Price:
-                            query = query.OrderByDescending(p => p.Price);
+                            orderedQuery = query.OrderByDescending(p => p.Price);
                             break;
                         case SortByOptionEnum.Stock:
-                            query = query.OrderByDescending(p => p.Stock);
+                            orderedQuery = query.OrderByDescending(p => p.Stock);
+                            break;
+                        default:
+                            orderedQuery = query.OrderByDescending(p => p.Id); 
                             break;
                     }
                 }
-
                 else
                 {
-                    switch (searchDto.SortBy)
+                 
+                    switch (firstCriterion.SortBy)
                     {
                         case SortByOptionEnum.Name:
-                            query = query.OrderBy(p => p.Name);
+                            orderedQuery = query.OrderBy(p => p.Name);
                             break;
                         case SortByOptionEnum.Price:
-                            query = query.OrderBy(p => p.Price);
+                            orderedQuery = query.OrderBy(p => p.Price);
                             break;
                         case SortByOptionEnum.Stock:
-                            query = query.OrderBy(p => p.Stock);
+                            orderedQuery = query.OrderBy(p => p.Stock);
+                            break;
+                        default:
+                            orderedQuery = query.OrderBy(p => p.Id); 
                             break;
                     }
                 }
 
-                
+               
+                foreach (var criterion in searchDto.SortCriteria.Skip(1))
+                {
+                    if (criterion.SortDirection == SortDirectionOptionEnum.Descending)
+                    {
+                        switch (criterion.SortBy)
+                        {
+                            case SortByOptionEnum.Name:
+                                orderedQuery = orderedQuery.ThenByDescending(p => p.Name);
+                                break;
+                            case SortByOptionEnum.Price:
+                                orderedQuery = orderedQuery.ThenByDescending(p => p.Price);
+                                break;
+                            case SortByOptionEnum.Stock:
+                                orderedQuery = orderedQuery.ThenByDescending(p => p.Stock);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (criterion.SortBy)
+                        {
+                            case SortByOptionEnum.Name:
+                                orderedQuery = orderedQuery.ThenBy(p => p.Name);
+                                break;
+                            case SortByOptionEnum.Price:
+                                orderedQuery = orderedQuery.ThenBy(p => p.Price);
+                                break;
+                            case SortByOptionEnum.Stock:
+                                orderedQuery = orderedQuery.ThenBy(p => p.Stock);
+                                break;
+                        }
+                    }
+                }
+
+                query = orderedQuery;
             }
             if (searchDto.PageNumber.HasValue && searchDto.PageSize.HasValue)
             {

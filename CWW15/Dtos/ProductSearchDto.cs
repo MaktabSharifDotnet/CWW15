@@ -17,8 +17,7 @@ namespace CWW15.Dtos
         public string? Color { get; set; }
         public string? Brand { get; set; }
         public int? MinStock { get; set; }
-        public SortByOptionEnum? SortBy { get; set; }
-        public SortDirectionOptionEnum? SortDirection { get; set; }
+        public List<SortCriterionDto> SortCriteria { get; set; } = [];
         public int? PageNumber { get; set; }
         public int? PageSize { get; set; }
     }

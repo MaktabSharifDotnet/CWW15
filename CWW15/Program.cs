@@ -9,15 +9,15 @@ var dbContext = new AppDbContext();
 var productRepository = new ProductRepository(dbContext);
 var productService = new ProductService(productRepository);
 
-
 while (true)
 {
-    Console.Clear(); 
+    Console.Clear();
     Console.WriteLine("--- Product Search Engine ---");
     Console.WriteLine("Type 'exit' at any time to quit the program.");
 
     var searchDto = new ProductSearchDto();
 
+   
     Console.Write("\nEnter Product Name (or leave empty): ");
     var nameInput = Console.ReadLine();
     if (nameInput?.ToLower() == "exit") break;
@@ -28,60 +28,58 @@ while (true)
     if (maxPriceInput?.ToLower() == "exit") break;
     if (!string.IsNullOrWhiteSpace(maxPriceInput))
     {
-        try
-        {
-            searchDto.MaxPrice = decimal.Parse(maxPriceInput);
-        }
-        catch (FormatException)
-        {
-            Console.WriteLine("Invalid format for price. Price filter will be ignored.");
-        }
+        try { searchDto.MaxPrice = decimal.Parse(maxPriceInput); }
+        catch (FormatException) { Console.WriteLine("Invalid format for price. Filter ignored."); }
     }
 
-
+ 
     Console.WriteLine("\n--- Sort Options ---");
-    Console.WriteLine("Sort by: 1. Name | 2. Price | 3. Stock | (Leave empty for no sort)");
-    Console.Write("Enter your choice: ");
-    var sortByInput = Console.ReadLine();
-    if (sortByInput?.ToLower() == "exit") break;
-    if (!string.IsNullOrWhiteSpace(sortByInput))
+    while (true)
     {
+        Console.WriteLine("Add a sort criterion? (y/n)");
+        var addSort = Console.ReadLine();
+        if (addSort?.ToLower() != "y")
+        {
+            break;
+        }
+
+        var criterion = new SortCriterionDto();
+
+        Console.WriteLine("Sort by: 1. Name | 2. Price | 3. Stock");
+        Console.Write("Enter your choice: ");
+        var sortByInput = Console.ReadLine();
+
         try
         {
             int sortByChoice = int.Parse(sortByInput);
             switch (sortByChoice)
             {
-                case 1: searchDto.SortBy = SortByOptionEnum.Name; break;
-                case 2: searchDto.SortBy = SortByOptionEnum.Price; break;
-                case 3: searchDto.SortBy = SortByOptionEnum.Stock; break;
-                default: Console.WriteLine("Invalid choice for sort by. Sort will be ignored."); break;
+                case 1: criterion.SortBy = SortByOptionEnum.Name; break;
+                case 2: criterion.SortBy = SortByOptionEnum.Price; break;
+                case 3: criterion.SortBy = SortByOptionEnum.Stock; break;
+                default: Console.WriteLine("Invalid choice. Ignoring this criterion."); continue;
             }
 
-            if (searchDto.SortBy.HasValue)
+            Console.WriteLine("Sort direction: 1. Ascending | 2. Descending (default: Ascending)");
+            Console.Write("Enter your choice: ");
+            var sortDirectionInput = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(sortDirectionInput))
             {
-                Console.WriteLine("Sort direction: 1. Ascending | 2. Descending");
-                Console.Write("Enter your choice: ");
-                var sortDirectionInput = Console.ReadLine();
-                if (sortDirectionInput?.ToLower() == "exit") break;
-                if (!string.IsNullOrWhiteSpace(sortDirectionInput))
+                if (int.Parse(sortDirectionInput) == 2)
                 {
-                    int sortDirectionChoice = int.Parse(sortDirectionInput);
-                    if (sortDirectionChoice == 2)
-                    {
-                        searchDto.SortDirection = SortDirectionOptionEnum.Descending;
-                    }
-                    else
-                    {
-                        searchDto.SortDirection = SortDirectionOptionEnum.Ascending;
-                    }
+                    criterion.SortDirection = SortDirectionOptionEnum.Descending;
                 }
             }
+
+            searchDto.SortCriteria.Add(criterion);
+            Console.WriteLine("--> Sort criterion added!");
         }
         catch (FormatException)
         {
-            Console.WriteLine("Invalid format for sort choice. Sort will be ignored.");
+            Console.WriteLine("Invalid format. Ignoring this criterion.");
         }
     }
+
 
     Console.WriteLine("\n--- Pagination Options ---");
     Console.Write("Enter Page Size (e.g., 5, or leave empty for all): ");
@@ -110,7 +108,6 @@ while (true)
         }
     }
 
-   
     Console.WriteLine("\nSearching for products...");
     var results = productService.SearchProducts(searchDto);
 
@@ -127,7 +124,6 @@ while (true)
         Console.WriteLine("No products found matching your criteria.");
     }
 
-    
     Console.WriteLine("\nPress any key to start a new search...");
     Console.ReadKey();
 }
