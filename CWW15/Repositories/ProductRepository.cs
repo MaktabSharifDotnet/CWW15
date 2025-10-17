@@ -1,5 +1,4 @@
 ﻿
-
 using CWW15.DataAccess;
 using CWW15.Dtos; 
 using CWW15.Entities;
@@ -15,11 +14,9 @@ namespace CWW15.Repositories
         {
             _context = context;
         }
-
         public List<Product> SearchProducts(ProductSearchDto searchDto)
         {
             var query = _context.Products.Include(p => p.Category).AsQueryable();
-
 
             if (!string.IsNullOrWhiteSpace(searchDto.Name))
             {
@@ -103,9 +100,7 @@ namespace CWW15.Repositories
                             orderedQuery = query.OrderBy(p => p.Id); 
                             break;
                     }
-                }
-
-               
+                }           
                 foreach (var criterion in searchDto.SortCriteria.Skip(1))
                 {
                     if (criterion.SortDirection == SortDirectionOptionEnum.Descending)
