@@ -57,86 +57,10 @@ namespace CWW15.Repositories
                 query = query.Where(p => p.Stock >= searchDto.MinStock.Value);
             }
 
-            if (searchDto.SortCriteria.Any())
-            {
-                
-                var firstCriterion = searchDto.SortCriteria.First();
-                IOrderedQueryable<Product> orderedQuery;
+           // sort-rewrite
 
-                if (firstCriterion.SortDirection == SortDirectionOptionEnum.Descending)
-                {
-                    
-                    switch (firstCriterion.SortBy)
-                    {
-                        case SortByOptionEnum.Name:
-                            orderedQuery = query.OrderByDescending(p => p.Name);
-                            break;
-                        case SortByOptionEnum.Price:
-                            orderedQuery = query.OrderByDescending(p => p.Price);
-                            break;
-                        case SortByOptionEnum.Stock:
-                            orderedQuery = query.OrderByDescending(p => p.Stock);
-                            break;
-                        default:
-                            orderedQuery = query.OrderByDescending(p => p.Id); 
-                            break;
-                    }
-                }
-                else
-                {
-                 
-                    switch (firstCriterion.SortBy)
-                    {
-                        case SortByOptionEnum.Name:
-                            orderedQuery = query.OrderBy(p => p.Name);
-                            break;
-                        case SortByOptionEnum.Price:
-                            orderedQuery = query.OrderBy(p => p.Price);
-                            break;
-                        case SortByOptionEnum.Stock:
-                            orderedQuery = query.OrderBy(p => p.Stock);
-                            break;
-                        default:
-                            orderedQuery = query.OrderBy(p => p.Id); 
-                            break;
-                    }
-                }           
-                foreach (var criterion in searchDto.SortCriteria.Skip(1))
-                {
-                    if (criterion.SortDirection == SortDirectionOptionEnum.Descending)
-                    {
-                        switch (criterion.SortBy)
-                        {
-                            case SortByOptionEnum.Name:
-                                orderedQuery = orderedQuery.ThenByDescending(p => p.Name);
-                                break;
-                            case SortByOptionEnum.Price:
-                                orderedQuery = orderedQuery.ThenByDescending(p => p.Price);
-                                break;
-                            case SortByOptionEnum.Stock:
-                                orderedQuery = orderedQuery.ThenByDescending(p => p.Stock);
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        switch (criterion.SortBy)
-                        {
-                            case SortByOptionEnum.Name:
-                                orderedQuery = orderedQuery.ThenBy(p => p.Name);
-                                break;
-                            case SortByOptionEnum.Price:
-                                orderedQuery = orderedQuery.ThenBy(p => p.Price);
-                                break;
-                            case SortByOptionEnum.Stock:
-                                orderedQuery = orderedQuery.ThenBy(p => p.Stock);
-                                break;
-                        }
-                    }
-                }
 
-                query = orderedQuery;
-            }
+
             if (searchDto.PageNumber.HasValue && searchDto.PageSize.HasValue)
             {
               
@@ -144,6 +68,7 @@ namespace CWW15.Repositories
                            
                              .Take(searchDto.PageSize.Value);
             }
+
             return query.ToList();
         }
     }
